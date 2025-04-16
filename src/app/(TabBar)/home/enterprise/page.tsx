@@ -8,6 +8,7 @@ import SuggestBox, { SuggestBoxProps } from "@/component/SuggestBox";
 import { getSuggestData } from "@/service/data";
 import useVoiceRecorder from "@/hook/useVoiceRecorder";
 import { handleVoiceTranscribe } from "@/service/voice";
+import "@ant-design/v5-patch-for-react-19";
 
 const Page = () => {
   const [allowSpeech, setAllowSpeech] = useState(false);
