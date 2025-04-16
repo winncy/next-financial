@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const customFont = localFont({
   src: [
     {
-      path: "../../public/fonts/HYQiHei_65S.ttf",
+      path: "../../public/fonts/HYQiHei-55S.ttf",
       weight: "300",
       style: "normal",
     },
