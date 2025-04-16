@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <header className="z-20 h-14 shadow-lg">
         <TabBar />
       </header>
-      <div className="min-h-0 min-w-0 flex-1 overflow-hidden bg-gradient-to-b from-[#DBE2EF] to-60%">
+      <div className="min-h-0 min-w-0 flex-1 overflow-hidden bg-gradient-to-b from-blue-50 to-60%">
         {children}
       </div>
     </div>
