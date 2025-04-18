@@ -142,7 +142,7 @@ const Page = () => {
   );
 
   return (
-    <div className="flex h-full flex-col pb-24">
+    <div className="flex h-full flex-col pt-4 pb-24">
       {(!messages || messages.length === 0) && (
         <div className="flex-1 pt-[10%]">
           <div className="flex flex-wrap gap-4">

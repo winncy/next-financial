@@ -1,40 +1,55 @@
 import { SuggestBoxProps } from "@/component/SuggestBox";
+import { MenuItemType } from "@/service/menu";
+
+export const mockMenuData: MenuItemType[] = [
+  {
+    id: "1",
+    name: "财务分析",
+    subItems: [
+      { subId: "1-1", subName: "基于七维度模型的总体分析", subUrl: "" },
+      { subId: "1-2", subName: "财务风险预警", subUrl: "" },
+      { subId: "1-3", subName: "现金流压力测试", subUrl: "" },
+      { subId: "1-4", subName: "财务报表预测", subUrl: "" },
+    ],
+  },
+  {
+    id: "2",
+    name: "价值评估工具",
+    subItems: [
+      { subId: "2-1", subName: "七维度评估模型", subUrl: "" },
+      { subId: "2-2", subName: "规模评估", subUrl: "" },
+      { subId: "2-3", subName: "盈利能力评估", subUrl: "" },
+      { subId: "2-4", subName: "运营能力评估", subUrl: "" },
+      { subId: "2-5", subName: "成长能力评估", subUrl: "" },
+      { subId: "2-6", subName: "费用结构评估", subUrl: "" },
+      { subId: "2-7", subName: "WACC评估", subUrl: "" },
+      { subId: "2-8", subName: "前瞻性业务指标评估", subUrl: "" },
+    ],
+  },
+  {
+    id: "3",
+    name: "风险预警系统",
+    subItems: [{ subId: "3-1", subName: "七维度风险预警分析", subUrl: "" }],
+  },
+  {
+    id: "4",
+    name: "智能对标系",
+    subItems: [
+      { subId: "4-1", subName: "对标国内上市公司", subUrl: "" },
+      { subId: "4-2", subName: "对标境外美股/其他公司", subUrl: "" },
+    ],
+  },
+];
 
 export const getSuggestData = (page: string) =>
   new Promise<SuggestBoxProps[]>((resolve) => {
     if (page === "enterprise") {
-      resolve([
-        {
-          title: "财务分析",
-          description: [
-            "基于七维度模型的总体分析",
-            "财务风险预警",
-            "现金流压力测试",
-            "财务报表预测",
-          ],
-        },
-        {
-          title: "价值评估工具",
-          description: [
-            "七维度评估模型",
-            "规模评估",
-            "盈利能力评估",
-            "运营能力评估",
-            "成长能力评估",
-            "费用结构评估",
-            "WACC评估",
-            "前瞻性业务指标评估",
-          ],
-        },
-        {
-          title: "风险预警系统",
-          description: ["七维度风险预警分析"],
-        },
-        {
-          title: "智能对标系",
-          description: ["对标国内上市公司", "对标境外美股/其他公司"],
-        },
-      ] as SuggestBoxProps[]);
+      resolve(
+        mockMenuData.map((menu) => ({
+          title: menu.name,
+          description: menu.subItems?.map((item) => item.subName),
+        })) as SuggestBoxProps[],
+      );
     } else {
       resolve([]);
     }
