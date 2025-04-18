@@ -1,21 +1,40 @@
 "use client";
 
-import { Attachments, AttachmentsProps, Sender } from "@ant-design/x";
-import React, { useEffect, useRef, useState } from "react";
-import { CloudUploadOutlined, LinkOutlined } from "@ant-design/icons";
+import {
+  Attachments,
+  AttachmentsProps,
+  Bubble,
+  Sender,
+  useXAgent,
+  useXChat,
+  type BubbleProps,
+} from "@ant-design/x";
+import { ChartType, GPTVis, Line, withChartCode } from "@antv/gpt-vis";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  CloudUploadOutlined,
+  LinkOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Badge, Button, GetProp, GetRef } from "antd";
 import SuggestBox, { SuggestBoxProps } from "@/component/SuggestBox";
 import { getSuggestData } from "@/service/data";
 import useVoiceRecorder from "@/hook/useVoiceRecorder";
 import { handleVoiceTranscribe } from "@/service/voice";
 import "@ant-design/v5-patch-for-react-19";
+import { postStreamData } from "@/service/api";
 
 const Page = () => {
   const [allowSpeech, setAllowSpeech] = useState(false);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<GetProp<AttachmentsProps, "items">>([]);
   const senderRef = useRef<GetRef<typeof Sender>>(null);
-  const [showSuggest, setShowSuggest] = useState<boolean>(true);
   const [inputValue, setInputValue] = useState<string>();
   const [showVoiceHandleDesc, setShowVoiceHandleDesc] =
     useState<boolean>(false);
@@ -30,6 +49,61 @@ const Page = () => {
         setInputValue(text as string);
       },
     });
+
+  const [agent] = useXAgent({
+    request: async ({ message }, { onSuccess, onError, onUpdate }) => {
+      let cachedResult = "";
+      postStreamData(
+        "http://localhost:8000/chat",
+        (result) => {
+          const message = JSON.parse(result)["message"];
+          cachedResult += message;
+          onUpdate(cachedResult);
+        },
+        {
+          message,
+        },
+      )
+        .then(() => onSuccess(cachedResult))
+        .catch(onError);
+    },
+  });
+
+  const { onRequest, messages } = useXChat({
+    agent,
+  });
+
+  const CodeComponent = useMemo(
+    () =>
+      withChartCode({
+        components: { [ChartType.Line]: Line },
+        style: { width: 600 },
+      }),
+    [],
+  );
+
+  const RenderMarkdown: BubbleProps["messageRender"] = useCallback(
+    (content: string) => {
+      return <GPTVis components={{ code: CodeComponent }}>{content}</GPTVis>;
+    },
+    [CodeComponent],
+  );
+
+  const roles: GetProp<typeof Bubble.List, "roles"> = {
+    ai: {
+      placement: "start",
+      avatar: { icon: <UserOutlined />, style: { background: "#fde3cf" } },
+      typing: { step: 5, interval: 20 },
+      style: {
+        maxWidth: 600,
+      },
+      messageRender: RenderMarkdown,
+    },
+    local: {
+      placement: "end",
+      avatar: { icon: <UserOutlined />, style: { background: "#87d068" } },
+    },
+  };
 
   useEffect(() => {
     setAllowSpeech(true);
@@ -69,18 +143,34 @@ const Page = () => {
 
   return (
     <div className="flex h-full flex-col pb-24">
-      <div className="flex-1 pt-[10%]">
-        <div className="flex flex-wrap gap-4">
-          {showSuggest &&
-            suggests.map((s, index) => (
+      {(!messages || messages.length === 0) && (
+        <div className="flex-1 pt-[10%]">
+          <div className="flex flex-wrap gap-4">
+            {suggests.map((s, index) => (
               <SuggestBox
                 key={s.title + index}
                 title={s.title}
                 description={s.description}
               />
             ))}
+          </div>
         </div>
-      </div>
+      )}
+      {messages && (
+        <div className="flex flex-1 flex-col overflow-y-hidden py-2">
+          <Bubble.List
+            roles={roles}
+            style={{
+              scrollbarWidth: "none",
+            }}
+            items={messages.map(({ id, message, status }) => ({
+              key: id,
+              role: status === "local" ? "local" : "ai",
+              content: message,
+            }))}
+          />
+        </div>
+      )}
       {showVoiceHandleDesc && (
         <div className="absolute right-0 bottom-0 text-sm text-gray-300">
           {recordingStatus}
@@ -95,6 +185,11 @@ const Page = () => {
               <Button onClick={() => setOpen(!open)} icon={<LinkOutlined />} />
             </Badge>
           }
+          onSubmit={(message) => {
+            console.log(message);
+            onRequest(message);
+            setInputValue("");
+          }}
           placeholder={"请输入问题，按回车进行提问"}
           onChange={setInputValue}
           allowSpeech={

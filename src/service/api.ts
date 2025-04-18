@@ -18,6 +18,29 @@ export async function fetchData(
   return await response.json();
 }
 
+export const fetchStreamData = async (
+  url: string,
+  onResult: (result: string) => void,
+  options: RequestInit = {},
+): Promise<void> =>
+  new Promise<void>(async (resolve, reject) => {
+    const res = await fetch(url, options);
+    if (!res.body) {
+      reject("缺少返回体body");
+      return;
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      onResult(chunk);
+    }
+    resolve();
+  });
+
 export async function postForm(
   url: string,
   form: FormData,
@@ -40,6 +63,20 @@ export async function postData(
   });
 }
 
+export async function postStreamData(
+  url: string,
+  onResult: (result: string) => void,
+  param?: Record<string, AnyType>,
+): Promise<void> {
+  return fetchStreamData(url, onResult, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(param),
+  });
+}
+
 export async function getData(
   url: string,
   param?: Record<string, AnyType>,
@@ -47,6 +84,16 @@ export async function getData(
   let searchParams = new URLSearchParams(mapToStringMap(param)).toString();
   searchParams = searchParams ? `?${searchParams}` : "";
   return fetchData(`${url}${searchParams}`);
+}
+
+export async function getStreamData(
+  url: string,
+  onResult: (result: string) => void,
+  param?: Record<string, AnyType>,
+): Promise<void> {
+  let searchParams = new URLSearchParams(mapToStringMap(param)).toString();
+  searchParams = searchParams ? `?${searchParams}` : "";
+  return fetchStreamData(`${url}${searchParams}`, onResult);
 }
 
 function mapToStringMap(
