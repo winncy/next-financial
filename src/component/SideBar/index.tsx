@@ -33,7 +33,8 @@ const SideBar = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    getMenuItems().then((res) => {
+    const pathType = pathname.split("/")[1];
+    getMenuItems(pathType).then((res) => {
       setMenuItems(
         res.map((item) => ({
           key: item.id,
@@ -45,11 +46,11 @@ const SideBar = () => {
         })),
       );
     });
-  }, []);
+  }, [pathname]);
 
   const levelKeys = getLevelKeys(menuItems as LevelKeysProps[]);
 
-  const [stateOpenKeys, setStateOpenKeys] = useState(["2", "23"]);
+  const [stateOpenKeys, setStateOpenKeys] = useState<string[]>([]);
 
   const onOpenChange: MenuProps["onOpenChange"] = (openKeys) => {
     const currentOpenKey = openKeys.find(

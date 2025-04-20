@@ -11,7 +11,7 @@ export type MenuItemType = {
   }[];
 };
 
-export const getMenuItems = () =>
+export const getMenuItems = (pathType: string) =>
   new Promise<MenuItemType[]>((resolve) => {
-    resolve(mockMenuData);
+    resolve(mockMenuData[pathType]);
   });

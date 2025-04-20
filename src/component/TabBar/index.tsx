@@ -1,25 +1,30 @@
 "use client";
 import { Button, Menu, MenuProps } from "antd";
-import { useState } from "react";
-import { Building2, Cog, Factory } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Building2, Cog, Factory, FolderSearch2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 const TabBar = () => {
-  const onClick: MenuProps["onClick"] = (e) => {
-    setCurrent(e.key);
-  };
-  const [current, setCurrent] = useState("/analysis/enterprise");
+  const router = useRouter();
+  const path = usePathname();
+  const [current, setCurrent] = useState<string>("");
 
   const items: MenuItem[] = [
     {
+      label: "可研分析",
+      key: "/feasibility",
+      icon: <FolderSearch2 size={16} />,
+    },
+    {
       label: "企业分析",
-      key: "/analysis/enterprise",
+      key: "/enterprise",
       icon: <Building2 size={16} />,
     },
     {
       label: "行业分析",
-      key: "/analysis/industry",
+      key: "/industry",
       icon: <Factory size={16} />,
     },
     {
@@ -28,6 +33,20 @@ const TabBar = () => {
       icon: <Cog size={16} />,
     },
   ];
+
+  const onClick: MenuProps["onClick"] = (e) => {
+    setCurrent(e.key);
+    router.replace(e.key);
+  };
+
+  useEffect(() => {
+    items.forEach((item) => {
+      if (item?.key && path.startsWith(item.key.toString())) {
+        setCurrent(item.key.toString());
+      }
+    });
+  }, [path]);
+
   return (
     <div className="flex h-full w-full items-stretch">
       <div className="flex flex-1 items-end">
