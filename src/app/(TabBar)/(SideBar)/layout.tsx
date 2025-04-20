@@ -2,7 +2,6 @@
 
 import SideBar from "@/component/SideBar";
 import React, { PropsWithChildren, useState } from "react";
-import BreadcrumbBar from "@/component/BreadcrumbBar";
 import Image from "next/image";
 import { FloatButton } from "antd";
 import { RobotOutlined } from "@ant-design/icons";
@@ -35,13 +34,8 @@ const Layout = ({ children }: PropsWithChildren) => {
           />
         </div>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
-        <div className="mt-4 h-fit px-4 py-2">
-          <BreadcrumbBar />
-        </div>
-        <div className="min-h-0 min-w-0 flex-1 overflow-hidden p-4 pt-0">
-          {children}
-        </div>
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white p-4">
+        {children}
       </div>
       <FloatButton
         icon={<RobotOutlined />}

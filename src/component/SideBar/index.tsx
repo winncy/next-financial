@@ -3,6 +3,7 @@
 import { ConfigProvider, Menu, MenuProps } from "antd";
 import { useEffect, useState } from "react";
 import { getMenuItems } from "@/service/menu";
+import { usePathname, useRouter } from "next/navigation";
 
 type MenuItem = Required<MenuProps>["items"][number];
 interface LevelKeysProps {
@@ -28,6 +29,8 @@ const getLevelKeys = (items1: LevelKeysProps[]) => {
 
 const SideBar = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     getMenuItems().then((res) => {
@@ -36,7 +39,7 @@ const SideBar = () => {
           key: item.id,
           label: item.name,
           children: item.subItems?.map((subItem) => ({
-            key: subItem.subId,
+            key: subItem.subUrl,
             label: subItem.subName,
           })),
         })),
@@ -86,10 +89,13 @@ const SideBar = () => {
         <Menu
           mode="inline"
           style={{ height: "100%", border: 0 }}
-          // defaultSelectedKeys={["231"]}
+          defaultSelectedKeys={[pathname]}
           openKeys={stateOpenKeys}
-          onOpenChange={onOpenChange}
           items={menuItems}
+          onOpenChange={onOpenChange}
+          onSelect={(param) => {
+            router.replace(param.key);
+          }}
         />
       </div>
     </ConfigProvider>
