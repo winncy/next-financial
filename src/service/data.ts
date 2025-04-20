@@ -185,9 +185,52 @@ const industry: MenuItemType[] = [
   },
 ];
 
+const feasibility: MenuItemType[] = [
+  {
+    id: "1",
+    name: "可研报告",
+    url: "/feasibility/report",
+  },
+  {
+    id: "2",
+    name: "汇总分析",
+    url: "/feasibility/combine",
+  },
+  {
+    id: "3",
+    name: "跨报告对比",
+    url: "/feasibility/comparison",
+  },
+];
+
+const config: MenuItemType[] = [
+  {
+    id: "1",
+    name: "基础指标",
+    url: "/config/indicators",
+  },
+  {
+    id: "2",
+    name: "七维度模型",
+    url: "/config/model",
+  },
+  {
+    id: "3",
+    name: "自定义模型",
+    url: "/config/self-model",
+  },
+  {
+    id: "4",
+    name: "自定义指标",
+    url: "/config/self-indicators",
+  },
+];
+
 export const mockMenuData: Record<string, MenuItemType[]> = {
   enterprise,
   industry,
+  feasibility,
+  config,
 };
 
 export const getSuggestData = (page: string) =>
