@@ -240,6 +240,7 @@ export const getSuggestData = (page: string) =>
         mockMenuData[page].map((menu) => ({
           title: menu.name,
           description: menu.subItems?.map((item) => item.subName),
+          url: menu.subItems?.[0]?.subUrl,
         })) as SuggestBoxProps[],
       );
     } else {

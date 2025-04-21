@@ -37,7 +37,7 @@ const SideBar = () => {
     getMenuItems(pathType).then((res) => {
       setMenuItems(
         res.map((item) => ({
-          key: item.id,
+          key: item.url || item.id,
           label: item.name,
           children: item.subItems?.map((subItem) => ({
             key: subItem.subUrl,

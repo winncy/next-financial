@@ -147,11 +147,7 @@ const Page = () => {
         <div className="flex-1 pt-[10%]">
           <div className="flex flex-wrap gap-4">
             {suggests.map((s, index) => (
-              <SuggestBox
-                key={s.title + index}
-                title={s.title}
-                description={s.description}
-              />
+              <SuggestBox key={s.title + index} {...s} />
             ))}
           </div>
         </div>
