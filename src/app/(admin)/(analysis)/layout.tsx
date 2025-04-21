@@ -3,8 +3,6 @@
 import SideBar from "@/component/SideBar";
 import React, { PropsWithChildren, useState } from "react";
 import Image from "next/image";
-import { FloatButton } from "antd";
-import { RobotOutlined } from "@ant-design/icons";
 
 const Layout = ({ children }: PropsWithChildren) => {
   const [showSideBar, setShowSideBar] = useState(true);
@@ -34,13 +32,13 @@ const Layout = ({ children }: PropsWithChildren) => {
           />
         </div>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white p-4">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white p-4 pt-8">
         {children}
       </div>
-      <FloatButton
-        icon={<RobotOutlined />}
-        onClick={() => console.log("onClick")}
-      />
+      {/*<FloatButton*/}
+      {/*  icon={<RobotOutlined />}*/}
+      {/*  onClick={() => console.log("onClick")}*/}
+      {/*/>*/}
     </div>
   );
 };
