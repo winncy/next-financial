@@ -13,11 +13,15 @@
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@ant-design/x": "^1.1.1",
     "@antv/gpt-vis": "^0.4.7",
+    "ahooks": "^3.8.4",
     "antd": "^5.24.7",
     "lucide-react": "^0.488.0",
     "next": "15.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-pdf": "^9.2.1",
+    "react-syntax-highlighter": "^15.6.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
