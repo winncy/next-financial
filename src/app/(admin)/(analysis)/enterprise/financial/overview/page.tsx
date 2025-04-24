@@ -27,7 +27,7 @@ const Page = () => {
   return (
     <div className="flex h-full justify-center border border-red-500">
       <div className="h-full w-[80%] overflow-y-auto">
-        <PdfViewer url={"/20250418.pdf"} />
+        {/*<PdfViewer url={"/20250418.pdf"} />*/}
       </div>
     </div>
   );

@@ -4,6 +4,9 @@ import { Button, Form, Input, Table, TableProps, Tag, Tooltip } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import useModal from "antd/es/modal/useModal";
 import ReportDetail from "@/app/(admin)/(analysis)/feasibility/report/ReportDetail";
+import dayjs from "dayjs";
+import ReportHeader from "@/app/(admin)/(analysis)/feasibility/report/ReportHeader";
+import ReportSummary from "@/app/(admin)/(analysis)/feasibility/report/ReportSummary";
 
 export interface ReportDataType {
   key: string;
@@ -24,27 +27,26 @@ type FieldType = {
 const Page = () => {
   const [modal, contextHolder] = useModal();
 
-  const showReportDetail = (record: ReportDataType) => {
-    const { keyWords, reportName, enterprise, industry } = record;
+  const showReportSummary = (report: ReportDataType) => {
     modal.info({
-      title: (
-        <div className="flex flex-col gap-2">
-          {reportName}
-          <div>
-            <Tag color={enterprise ? "blue" : "gold"}>
-              {enterprise || industry}
-            </Tag>
-            {keyWords.map((value, index) => {
-              const s = value.split("|");
-              return (
-                <Tooltip key={value + index} title={s.length > 1 ? s[1] : ""}>
-                  <Tag>{s[0]}</Tag>
-                </Tooltip>
-              );
-            })}
-          </div>
+      title: <ReportHeader report={report} />,
+      width: "60%",
+      icon: <></>,
+      centered: true,
+      destroyOnClose: true,
+      closable: true,
+      footer: <></>,
+      content: (
+        <div className="h-[80vh]">
+          <ReportSummary report={report} />
         </div>
       ),
+    });
+  };
+
+  const showReportDetail = (report: ReportDataType) => {
+    modal.info({
+      title: <ReportHeader report={report} />,
       width: "80%",
       icon: <></>,
       centered: true,
@@ -53,7 +55,7 @@ const Page = () => {
       footer: <></>,
       content: (
         <div className="h-[80vh]">
-          <ReportDetail report={record} />
+          <ReportDetail report={report} />
         </div>
       ),
     });
@@ -230,7 +232,14 @@ const Page = () => {
       title: "更新日期",
       dataIndex: "updated",
       align: "center",
-      width: 150,
+      width: 120,
+    },
+    {
+      key: "status",
+      title: "解析状态",
+      align: "center",
+      width: 90,
+      render: () => <Tag color="green">成功</Tag>,
     },
     {
       key: "option",
@@ -239,10 +248,12 @@ const Page = () => {
       align: "center",
       render: (_, record) => (
         <div>
-          <Button type={"link"} onClick={() => showReportDetail(record)}>
-            查看
+          <Button type={"link"} onClick={() => showReportSummary(record)}>
+            摘要
           </Button>
-          <Button type={"link"}>摘要</Button>
+          <Button type={"link"} onClick={() => showReportDetail(record)}>
+            问答/分析
+          </Button>
         </div>
       ),
     },
@@ -294,7 +305,9 @@ const Page = () => {
       <Table<ReportDataType>
         rowSelection={{ type: "checkbox" }}
         className="flex-1"
-        dataSource={dataSource}
+        dataSource={dataSource.sort((a, b) =>
+          dayjs(a.updated).isBefore(b.updated) ? 1 : -1,
+        )}
         columns={columns}
       />
       {contextHolder}
