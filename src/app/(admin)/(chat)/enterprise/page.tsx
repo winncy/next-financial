@@ -9,7 +9,7 @@ import {
   useXChat,
   type BubbleProps,
 } from "@ant-design/x";
-import { ChartType, GPTVis, Line, withChartCode } from "@antv/gpt-vis";
+import { ChartType, GPTVis, Line, Bar, Pie, Column, withChartCode } from "@antv/gpt-vis";
 import React, {
   useCallback,
   useEffect,
@@ -22,13 +22,15 @@ import {
   LinkOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Badge, Button, GetProp, GetRef } from "antd";
+import { Badge, Button, GetProp, GetRef, Tooltip, message } from "antd";
 import SuggestBox, { SuggestBoxProps } from "@/component/SuggestBox";
 import { getSuggestData } from "@/service/data";
 import useVoiceRecorder from "@/hook/useVoiceRecorder";
 import { handleVoiceTranscribe } from "@/service/voice";
 import "@ant-design/v5-patch-for-react-19";
 import { postStreamData } from "@/service/api";
+import { DownloadOutlined } from "@ant-design/icons";
+import { convertToDocxAndDownload, captureChartImages } from "@/utils/docxConverter";
 
 const Page = () => {
   const [allowSpeech, setAllowSpeech] = useState(false);
@@ -39,6 +41,7 @@ const Page = () => {
   const [showVoiceHandleDesc, setShowVoiceHandleDesc] =
     useState<boolean>(false);
   const [suggests, setSuggests] = useState<SuggestBoxProps[]>([]);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
   const { startRecording, stopRecording, isRecording, recordingStatus } =
     useVoiceRecorder({
       handleVoice: async (voiceBlob: Blob) => {
@@ -76,15 +79,102 @@ const Page = () => {
   const CodeComponent = useMemo(
     () =>
       withChartCode({
-        components: { [ChartType.Line]: Line },
+        components: { [ChartType.Line]: Line,[ChartType.Bar]: Bar,[ChartType.Pie]: Pie,[ChartType.Column]: Column },
         style: { width: 600 },
       }),
     [],
   );
 
   const RenderMarkdown: BubbleProps["messageRender"] = useCallback(
-    (content: string) => {
-      return <GPTVis components={{ code: CodeComponent }}>{content}</GPTVis>;
+    (content: string, status?: string) => {
+      // Only show download button when the message is complete (not typing)
+      const isComplete = status !== 'typing';
+      
+      // Function to handle document download with chart images
+      const handleDownload = async () => {
+        if (!chartContainerRef.current) return;
+        
+        try {
+          // Find all chart elements in the container
+          // First try to find specific chart elements
+          let chartElements = chartContainerRef.current.querySelectorAll('.g2-chart, .g2plot-container, .vis-chart-container, .ant-chart');
+          
+          // If no specific chart elements found, try to find any SVG or canvas elements
+          if (chartElements.length === 0) {
+            chartElements = chartContainerRef.current.querySelectorAll('svg, canvas');
+            console.log('Using fallback chart element selection, found:', chartElements.length);
+          }
+          
+          // Debug info
+          console.log('Found chart elements:', chartElements.length);
+          if (chartElements.length > 0) {
+            Array.from(chartElements).forEach((el, i) => {
+              console.log(`Chart ${i+1} type:`, el.tagName, 'classes:', el.className);
+            });
+          }
+          
+          if (chartElements.length > 0) {
+            // Show loading message
+            message.loading('正在生成报告，请稍候...', 0);
+            
+            // Add a delay to ensure charts are fully rendered
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Capture chart images
+            const chartImages = await captureChartImages(Array.from(chartElements) as HTMLElement[]);
+            
+            // Debug info
+            console.log('Captured chart images:', chartImages.length);
+            chartImages.forEach((img, i) => {
+              console.log(`Image ${i+1} data URL length:`, img ? img.length : 0);
+            });
+            
+            // Generate timestamp for filename
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            
+            // Convert to docx with chart images
+            await convertToDocxAndDownload(
+              content, 
+              `企业分析报告_${timestamp}.docx`,
+              chartImages
+            );
+            
+            // Hide loading message
+            message.destroy();
+            message.success('报告已生成并下载');
+          } else {
+            // No charts, just download the document
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            await convertToDocxAndDownload(content, `企业分析报告_${timestamp}.docx`);
+            message.success('报告已生成并下载');
+          }
+        } catch (error) {
+          console.error('Error generating report:', error);
+          message.error('报告生成失败，请重试');
+        }
+      };
+      
+      return (
+        <div className="relative" ref={chartContainerRef}>
+          <GPTVis components={{ code: CodeComponent }}>{content}</GPTVis>
+          
+          {isComplete && (
+            <div className="flex justify-end mt-3">
+              <Tooltip title="下载为Word文档（含图表）">
+                <Button 
+                  type="primary" 
+                  size="small" 
+                  icon={<DownloadOutlined />} 
+                  className="flex items-center shadow-md"
+                  onClick={handleDownload}
+                >
+                  下载报告
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
+      );
     },
     [CodeComponent],
   );
