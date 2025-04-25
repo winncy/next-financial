@@ -68,6 +68,7 @@ const Page = () => {
       reportName:
         "开源证券-九号公司-WD（689009.SH）：2024年两轮车&割草机器人持续超预期增长，全年现金分红超预期",
       enterprise: "九号公司",
+      industry: "电子设备、仪器和元件",
       keyWords: [
         "行业分析|报告深入分析了九号公司在两轮车和割草机器人领域的市场表现及增长潜力。",
         "业绩增长|公司2024年营收和净利润显著增长，且2025年预期继续保持高增长态势。",
@@ -85,6 +86,7 @@ const Page = () => {
       reportName:
         "山西证券-中国移动（600941.SH）：重点布局5.5G、推理算力、AI投资，新业务领域开辟新业态",
       enterprise: "中国移动",
+      industry: "多元电信服务",
       keyWords: [
         "5G与AI布局|重点分析中国移动在5.5G、推理算力和AI领域的投资布局。",
         "业务拓展|探讨公司在车联网、低空经济等新业务领域的突破。",
@@ -101,6 +103,7 @@ const Page = () => {
       reportId: "3",
       reportName: "浙商证券_公司点评_江苏银行(600919)_零售不良改善",
       enterprise: "江苏银行",
+      industry: "商业银行",
       keyWords: [
         "城商行|分析江苏银行作为城商行的业绩表现和市场定位。",
         "不良率改善|探讨公司零售不良率的改善及资产质量的稳定性。",
@@ -118,6 +121,7 @@ const Page = () => {
       reportName:
         "光大证券-布鲁可（0325.HK）：聚焦优质IP，打造强产品力拼搭角色类玩具",
       enterprise: "布鲁可",
+      industry: "家庭耐用消费品",
       keyWords: [
         "玩具行业|聚焦布鲁可在拼搭角色类玩具市场的领先地位和增长潜力。",
         "IP驱动|分析公司通过优质IP（如奥特曼、变形金刚）和产品力推动业务增长。",
@@ -135,6 +139,7 @@ const Page = () => {
       reportName:
         "国海证券-美年健康（002044.SZ）：AI赋能显效，体检龙头迈向数智化健管时代",
       enterprise: "美年健康",
+      industry: "医疗保健提供商与服务",
       keyWords: ["健康管理", "业绩调整", "AI技术应用"],
       updated: "2025-04-19",
       answerBotUrl:
@@ -148,6 +153,7 @@ const Page = () => {
       reportName:
         "光大证券_华测导航：业绩稳步增长，海外市场打开空间——华测导航（300627.SZ）跟踪报告之四_ws",
       enterprise: "华测导航",
+      industry: "电子设备、仪器和元件",
       keyWords: ["高精度定位技术", "海外市场拓展", "研发投入"],
       updated: "2025-04-19",
       answerBotUrl:
@@ -161,6 +167,7 @@ const Page = () => {
       reportName:
         "光大证券_千禾味业：24年营收承压，盈利能力有所改善——千禾味业（603027.SH）2024年报与25年一季报点评_ws",
       enterprise: "千禾味业",
+      industry: "食品",
       keyWords: ["调味品行业", "盈利能力改善", "战略调整"],
       updated: "2025-04-19",
       answerBotUrl:
@@ -174,6 +181,7 @@ const Page = () => {
       reportName:
         "华龙证券_公司研究_韦尔股份（603501_SH）2024年报点评报告：智能手机、汽车市场推动CIS主业高增_2025-04-16",
       enterprise: "韦尔股份",
+      industry: "半导体产品与半导体设备",
       keyWords: ["半导体行业", "智能手机与汽车市场", "研发投入"],
       updated: "2025-04-16",
       answerBotUrl:
@@ -186,9 +194,23 @@ const Page = () => {
       reportId: "9",
       reportName:
         "太平洋钢铁日报（20250417）生态环境部：钢铁行业做好加减法抓紧谋转型",
-      industry: "钢铁行业",
+      industry: "金属、非金属与采矿",
       keyWords: ["钢铁行业转型", "绿色技术应用", "市场动态"],
       updated: "2025-04-17",
+      answerBotUrl:
+        "http://localhost/chat/share?shared_id=10fb3e38204311f0b7113ebb01b4a4b5&from=chat&auth=BlODMwM2M4MGJhZjExZjBiNTVhOGFmYm",
+      analyseBotUrl:
+        'http://localhost/chat/share?shared_id=201e3fd2204311f09ca83ebb01b4a4b5&from=chat&auth=BlODMwM2M4MGJhZjExZjBiNTVhOGFmYm"',
+    },
+    {
+      key: "10",
+      reportId: "10",
+      reportName:
+        "国金证券-美年健康（002044.SZ）：专业体检行业龙头，内生外延打开增长新格局",
+      enterprise: "美年健康",
+      industry: "医疗保健提供商与服务",
+      keyWords: ["专业体检", "老龄化", "数字化转型"],
+      updated: "2023-10-12",
       answerBotUrl:
         "http://localhost/chat/share?shared_id=10fb3e38204311f0b7113ebb01b4a4b5&from=chat&auth=BlODMwM2M4MGJhZjExZjBiNTVhOGFmYm",
       analyseBotUrl:
@@ -206,23 +228,28 @@ const Page = () => {
       key: "keyWords",
       title: "报告关键词",
       dataIndex: "keyWords",
+      align: "center",
       width: 350,
       render: (_, { enterprise, industry, keyWords }) => {
         return (
-          <div>
-            {(enterprise || industry) && (
-              <Tag color={enterprise ? "blue" : "gold"}>
-                {enterprise || industry}
-              </Tag>
-            )}
-            {keyWords.slice(0, 2).map((keyword, index) => {
-              const s = keyword.split("|");
-              return (
-                <Tooltip key={keyword + index} title={s.length > 1 ? s[1] : ""}>
-                  <Tag>{s[0]}</Tag>
-                </Tooltip>
-              );
-            })}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between">
+              {industry && <Tag color="gold">{industry}</Tag>}
+              {enterprise && <Tag color="blue">{enterprise}</Tag>}
+            </div>
+            <div className="flex">
+              {keyWords.map((keyword, index) => {
+                const s = keyword.split("|");
+                return (
+                  <Tooltip
+                    key={keyword + index}
+                    title={s.length > 1 ? s[1] : ""}
+                  >
+                    <Tag>{s[0]}</Tag>
+                  </Tooltip>
+                );
+              })}
+            </div>
           </div>
         );
       },
