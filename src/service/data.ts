@@ -2,6 +2,7 @@ import { SuggestBoxProps } from "@/component/SuggestBox";
 import { MenuItemType } from "@/service/menu";
 import { ReportDataType } from "@/app/(admin)/(analysis)/feasibility/report/page";
 import dayjs from "dayjs";
+import { CombineDataType } from "@/app/(admin)/(analysis)/feasibility/combine/page";
 
 const enterprise: MenuItemType[] = [
   {
@@ -412,6 +413,65 @@ export const getReportData = () =>
     resolve(
       reportData.sort((a, b) =>
         dayjs(a.updated).isBefore(b.updated) ? 1 : -1,
+      ),
+    );
+  });
+
+function generateCombineData(reports: ReportDataType[], type = "both") {
+  const groups = new Map();
+
+  for (const report of reports) {
+    // 统一过滤industry为空的数据
+    if (!report.industry) continue;
+
+    // 根据type参数确定分组逻辑
+    let groupKey, groupEnterprise, groupIndustry;
+
+    if (type === "industry") {
+      groupKey = report.industry;
+      groupEnterprise = undefined; // 按行业分组时不保留企业信息
+      groupIndustry = report.industry;
+    } else {
+      groupKey = `${report.enterprise || "no_enterprise"}_${report.industry}`;
+      groupEnterprise = report.enterprise;
+      groupIndustry = report.industry;
+    }
+
+    // 合并数据逻辑
+    const existing = groups.get(groupKey);
+    if (existing) {
+      existing.reportCount++;
+      if (report.updated > existing.updated) {
+        existing.updated = report.updated;
+      }
+    } else {
+      groups.set(groupKey, {
+        reportCount: 1,
+        enterprise: groupEnterprise,
+        industry: groupIndustry,
+        updated: report.updated,
+      });
+    }
+  }
+
+  // 转换为目标数据结构
+  return Array.from(groups, ([key, group]) => ({
+    key,
+    reportCount: group.reportCount,
+    enterprise: group.enterprise,
+    industry: group.industry,
+    updated: group.updated,
+  }));
+}
+
+export const getCombinedData = (type?: string) =>
+  new Promise<CombineDataType[]>(async (resolve) => {
+    resolve(
+      generateCombineData(
+        reportData.sort((a, b) =>
+          dayjs(a.updated).isBefore(b.updated) ? 1 : -1,
+        ),
+        type,
       ),
     );
   });
